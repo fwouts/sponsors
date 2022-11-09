@@ -1,0 +1,43 @@
+name: Sponsors Scheduler
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+  push:
+    branches: [main]
+
+jobs:
+  update-sponsors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+
+      - name: Cache pnpm modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.pnpm-store
+          key: ${{ hashFiles('pnpm-lock.yaml') }}
+
+      - uses: pnpm/action-setup@v2.2.4
+        with:
+          run_install: true
+
+      - name: Update sponsors
+        run: pnpm sponsorkit
+        env:
+          SPONSORKIT_GITHUB_TOKEN: ${{ secrets.SPONSORS_TOKEN }}
+          SPONSORKIT_GITHUB_LOGIN: fwouts
+
+      - name: Commit
+        uses: EndBug/add-and-commit@v4
+        with:
+          message: "chore: update sponsors.svg"
+          add: "sponsors.*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

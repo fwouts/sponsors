@@ -1,0 +1,6 @@
+{
+  "name": "sponsors",
+  "dependencies": {
+    "sponsorkit": "^0.6.0"
+  }
+}
